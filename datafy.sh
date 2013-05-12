@@ -2,11 +2,16 @@
 
 echo "Generating for $1 [$2]";
 
-DIR=$(pwd)/$1/$2;
+DIR=$4/$1/$2;
 QFILE="Qvalue.dat";
 FIRST=""
-SECOND=""\
+SECOND=""
 PREV=""
+
+if [ ! -d $DIR/$(echo "1") ]; then
+	echo "Not the workind DIR"
+	exit 1
+fi
 rm $DIR/Data.txt
 touch $DIR/Data.txt
 for i in $(ls $DIR)
@@ -16,7 +21,7 @@ do
 		#echo $DATA
 		IFS=": " read -ra ADDR <<< "$DATA"
 		for i in "${ADDR[@]}"; do			
-			if [ "$PREV" = "$2" ]; then			
+			if [ "$PREV" = "$3" ]; then			
 				FIRST=$i
 			fi
 			if [ "$PREV" = "Q" ]; then
