@@ -1,0 +1,11 @@
+For lines
+plot "/home/zayed/....................." with lines ti "Zayed\ Shames"
+
+For smooth
+plot "/home/zayed/....................." using 1:2 smooth bezier ti "Zayed\ Shames"
+
+For label
+set xlabel "Label\ for\ x"
+set ylabel "Label\ for\ y"
+
+
