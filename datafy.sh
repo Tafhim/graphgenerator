@@ -9,7 +9,7 @@ SECOND=""
 PREV=""
 
 if [ ! -d $DIR/$(echo "1") ]; then
-	echo "Not the workind DIR"
+	echo "Not the working DIR"
 	exit 1
 fi
 rm $DIR/Data.txt
@@ -32,4 +32,3 @@ do
 		echo "$FIRST $SECOND" >> $DIR/Data.txt
 	fi
 done
-
