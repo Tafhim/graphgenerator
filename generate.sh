@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash -e
 
 if [ "$1" = "" ]; then
 	echo "Either specify a config file or choose between smooth and line"
@@ -7,7 +7,7 @@ fi
 
 
 
-MODE=$1 
+MODE=$1
 if [ "$MODE" = "single" ]; then
 	MODEL=$2
 	VARIABLE=$3
@@ -19,7 +19,10 @@ if [ "$MODE" = "single" ]; then
 		DATA=$5
 	fi
 	/bin/bash $(pwd)/datafy.sh $MODEL $VARIABLE $COMPARE $DATA
-	
+	if [ "$?" =  "1" ]; then
+		echo "Datafile not present [$MODEL]>[$VARIABLE]"
+		exit 1
+	fi
 	if [ "$6" = "smooth" ]; then
 		SETTING="using 1:2 smooth bezier"
 	else
@@ -65,7 +68,15 @@ elif [ "$MODE" = "compare" ]; then
 		DATA=$6
 	fi
 	/bin/bash $(pwd)/datafy.sh $MODEL1 $VARIABLE $COMPARE $DATA
+	if [ "$?" = "1" ]; then
+		echo "Datafile not present [$MODEL1]>[$VARIABLE]"
+		exit 1
+	fi
 	/bin/bash $(pwd)/datafy.sh $MODEL2 $VARIABLE $COMPARE $DATA
+	if [ "$?" = "1" ]; then
+		echo "Datafile not present [$MODEL2]>[$VARIABLE]"
+		exit 1
+	fi
 	if [ "$7" = "smooth" ]; then
 		SETTING="using 1:2 smooth bezier"
 	else

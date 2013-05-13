@@ -40,3 +40,5 @@ do
 		((count++))
 	fi
 done
+
+exit 0
