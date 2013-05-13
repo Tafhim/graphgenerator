@@ -1,5 +1,12 @@
 #!bin/bash
 
+if [ "$1" = "" ]; then
+	echo "Either specify a config file or choose between smooth and line"
+	exit 1
+fi
+
+
+
 MODE=$1 
 if [ "$MODE" = "single" ]; then
 	MODEL=$2
@@ -11,7 +18,7 @@ if [ "$MODE" = "single" ]; then
 	else
 		DATA=$5
 	fi
-	/bin/bash $(pwd)/datafy.sh $MODEL $VARIABLE $COMPARE $DATA &
+	/bin/bash $(pwd)/datafy.sh $MODEL $VARIABLE $COMPARE $DATA
 	
 	if [ "$6" = "smooth" ]; then
 		SETTING="using 1:2 smooth bezier"
@@ -20,11 +27,17 @@ if [ "$MODE" = "single" ]; then
 	fi
 
 	TITLE=$7
-	if [ "$TITLE" = "" ]; then
+	TITLE=${TITLE//+/ }
+	if [ "$TITLE" = "\"\"" ]; then
 		TITLE="notitle"
 	fi
+
 	X_AXIS=$8
 	Y_AXIS=$9
+	X_AXIS=${X_AXIS//+/ }
+	Y_AXIS=${Y_AXIS//+/ }
+
+
 
 	PROPERTIES="$SETTING $TITLE"
 
@@ -36,13 +49,11 @@ if [ "$MODE" = "single" ]; then
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
 	echo "set output \"$(pwd)/ouput\ $MODEL\ $VARIABLE\ $6.png\"" >> $CONFFILE 
 	echo "plot \"$DATA/$MODEL/$VARIABLE/Data.txt\" $PROPERTIES" >> $CONFFILE
-	cat $CONFFILE
+	#cat $CONFFILE
 	gnuplot $CONFFILE
-	rm $DATA/$MODEL/$VARIABLE/Data.txt
-	rm $(pwd)/temp.conf
-fi 
-
-if [ "$MODE" = "compare" ]; then
+	#rm $DATA/$MODEL/$VARIABLE/Data.txt
+	#rm $(pwd)/temp.conf
+elif [ "$MODE" = "compare" ]; then
 	MODEL1=$2
 	MODEL2=$3
 	VARIABLE=$4
@@ -61,15 +72,19 @@ if [ "$MODE" = "compare" ]; then
 		SETTING="with lines"
 	fi
 	TITLE1=$8
-	if [ "$TITLE1" = "" ]; then
+	if [ "$TITLE1" = "\"\"" ]; then
 		TITLE1="notitle"
 	fi
 	TITLE2=$9
-	if [ "$TITLE2" = "" ]; then
+	if [ "$TITLE2" = "\"\"" ]; then
 		TITLE2="notitle"
 	fi
 	X_AXIS=${10}
 	Y_AXIS=${11}
+	X_AXIS=${X_AXIS//+/ }
+	Y_AXIS=${Y_AXIS//+/ }
+
+
 	PROPERTIES1="$SETTING $TITLE1"
 	PROPERTIES2="$SETTING $TITLE2"
 
@@ -82,9 +97,20 @@ if [ "$MODE" = "compare" ]; then
 	echo "set output \"$(pwd)/ouput\ $MODEL1\ vs\ $MODEL2\ $VARIABLE\ $7.png\"" >> $CONFFILE 
 	echo "plot \"$DATA/$MODEL1/$VARIABLE/Data.txt\" $PROPERTIES1, \"$DATA/$MODEL2/$VARIABLE/Data.txt\" $PROPERTIES2" >> $CONFFILE
 
-	cat $CONFFILE
+	#cat $CONFFILE
 	gnuplot $CONFFILE
-	rm $DATA/$MODEL1/$VARIABLE/Data.txt
-	rm $DATA/$MODEL2/$VARIABLE/Data.txt
-	rm $(pwd)/temp.conf	
+	#rm $DATA/$MODEL1/$VARIABLE/Data.txt
+	#rm $DATA/$MODEL2/$VARIABLE/Data.txt
+	#rm $(pwd)/temp.conf	
+else
+	cnt=1
+	while read line
+	do
+		if [ "$line" = "" ]; then
+			continue
+		fi
+		echo "[$cnt]~ < $(echo -e "$line") >"
+		/bin/bash $(pwd)/generate.sh $(echo -e "$line")
+		((cnt++))
+	done <$1
 fi
