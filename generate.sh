@@ -40,14 +40,24 @@ if [ "$MODE" = "single" ]; then
 	X_AXIS=${X_AXIS//+/ }
 	Y_AXIS=${Y_AXIS//+/ }
 
-
-
+	MAX=""
+	QQQ=""
+	for i in $(cat $DATA/$MODEL/$VARIABLE/Data.txt)
+	do
+		MAX=$QQQ
+		QQQ=$i
+	done
+	echo $MAX
 	PROPERTIES="$SETTING $TITLE"
 
 	rm $(pwd)/temp.conf
 	touch $(pwd)/temp.conf
 	CONFFILE=$(pwd)/temp.conf
+
 	echo "set term pngcairo" > $CONFFILE
+	echo "set arrow from 0,6 to *,6 as 1 nohead" >> $CONFFILE
+	echo "set xrange [0:]" >> $CONFFILE
+	echo "set yrange [0:]" >> $CONFFILE
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
 	echo "set output \"$(pwd)/ouput\ $MODEL\ $VARIABLE\ $6.png\"" >> $CONFFILE 

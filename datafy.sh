@@ -40,5 +40,6 @@ do
 		((count++))
 	fi
 done
-
+sort -k1 -n $DIR/Data.txt > $DIR/tempData.txt
+sort -k1 -n $DIR/tempData.txt > $DIR/Data.txt
 exit 0
