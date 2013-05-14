@@ -1,5 +1,21 @@
 #!/bin/bash -e
 
+RESTORE='\033[0m'
+RED='\033[00;31m'
+GREEN='\033[00;32m'
+YELLOW='\033[00;33m'
+BLUE='\033[00;34m'
+PURPLE='\033[00;35m'
+CYAN='\033[00;36m'
+LIGHTGRAY='\033[00;37m'
+LRED='\033[01;31m'
+LGREEN='\033[01;32m'
+LYELLOW='\033[01;33m'
+LBLUE='\033[01;34m'
+LPURPLE='\033[01;35m'
+LCYAN='\033[01;36m'
+WHITE='\033[01;37m'
+
 if [ "$1" = "" ]; then
 	echo "Either specify a config file or choose between smooth and line"
 	exit 1
@@ -13,14 +29,14 @@ if [ "$MODE" = "single" ]; then
 	VARIABLE=$3
 	COMPARE=$4
 	if [ "$5" = "" ]; then
-		echo "Considering current directory to have data"
+		echo -e "${YELLOW}Considering current directory to have data${RESTORE}"
 		DATA=$(pwd)
 	else
 		DATA=$5
 	fi
 	/bin/bash $(pwd)/datafy.sh $MODEL $VARIABLE $COMPARE $DATA
 	if [ "$?" =  "1" ]; then
-		echo "Datafile not present [$MODEL]>[$VARIABLE]"
+		echo -e "${LRED}Datafile not present [$MODEL]>[$VARIABLE]${RESTORE}"
 		exit 1
 	fi
 	if [ "$6" = "smooth" ]; then
@@ -53,7 +69,6 @@ if [ "$MODE" = "single" ]; then
 	rm $(pwd)/temp.conf
 	touch $(pwd)/temp.conf
 	CONFFILE=$(pwd)/temp.conf
-
 	echo "set term pngcairo" > $CONFFILE
 	echo "set style line 1 lt 0 lw 3" >> $CONFFILE
 	echo "set style line 2 lc rgb \"red\" lw 3" >> $CONFFILE
@@ -65,7 +80,10 @@ if [ "$MODE" = "single" ]; then
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
 	echo "set output \"$(pwd)/ouput\ $MODEL\ $VARIABLE\ $6.png\"" >> $CONFFILE 
 	echo "plot \"$DATA/$MODEL/$VARIABLE/Data.txt\"  $PROPERTIES" >> $CONFFILE
-	#cat $CONFFILE
+	
+	echo -e "${LGREEN}[${LCYAN}---------------------------------------------------------------${LRED}<${LBLUE}"
+	cat $CONFFILE
+	echo -e "${LRED}>${LCYAN}---------------------------------------------------------------${LGREEN}]${RESTORE}"
 	gnuplot $CONFFILE
 	#rm $DATA/$MODEL/$VARIABLE/Data.txt
 	#rm $(pwd)/temp.conf
@@ -75,19 +93,19 @@ elif [ "$MODE" = "compare" ]; then
 	VARIABLE=$4
 	COMPARE=$5
 	if [ "$6" = "" ]; then
-		echo "Considering current directory to have data"
+		echo -e "${YELLOW}Considering current directory to have data${RESTORE}"
 		DATA=$(pwd)
 	else
 		DATA=$6
 	fi
 	/bin/bash $(pwd)/datafy.sh $MODEL1 $VARIABLE $COMPARE $DATA
 	if [ "$?" = "1" ]; then
-		echo "Datafile not present [$MODEL1]>[$VARIABLE]"
+		echo -e "${LRED}Datafile not present [$MODEL1]>[$VARIABLE]${RESTORE}"
 		exit 1
 	fi
 	/bin/bash $(pwd)/datafy.sh $MODEL2 $VARIABLE $COMPARE $DATA
 	if [ "$?" = "1" ]; then
-		echo "Datafile not present [$MODEL2]>[$VARIABLE]"
+		echo -e "${LRED}Datafile not present [$MODEL2]>[$VARIABLE]${RESTORE}"
 		exit 1
 	fi
 	if [ "$7" = "smooth" ]; then
@@ -132,20 +150,25 @@ elif [ "$MODE" = "compare" ]; then
 	echo "set term pngcairo" > $CONFFILE
 	echo "set style line 2 lc rgb \"red\" lw 3" >> $CONFFILE
 	echo "set style line 3 lc rgb \"blue\" lw 3" >> $CONFFILE
-	echo "set xrange [0:]" >> $CONFFILE
-	echo "set yrange [0:]" >> $CONFFILE
-	if [ "$MAX1" = "$MAX2" ]; then
-		echo "set style line 1 lt 0 lw 3" >> $CONFFILE
-		echo "set style arrow 1 nohead ls 1" >> $CONFFILE
-		echo "set arrow from 0,6 to $MAX1,6 as 1" >> $CONFFILE
-		echo "set xrange [0:$MAX1]" >> $CONFFILE
+	if [ "$MAX1" -ge "$MAX2" ]; then
+		MAX=$MAX1
+	else
+		MAX=$MAX2
 	fi
+	#if [ "$MAX1" = "$MAX2" ]; then
+	echo "set style line 1 lt 0 lw 3" >> $CONFFILE
+	echo "set style arrow 1 nohead ls 1" >> $CONFFILE
+	echo "set arrow from 0,6 to $MAX1,6 as 1" >> $CONFFILE
+	echo "set xrange [0:$MAX1]" >> $CONFFILE
+	echo "set yrange [0:]" >> $CONFFILE	
+	#fi
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
 	echo "set output \"$(pwd)/ouput\ $MODEL1\ vs\ $MODEL2\ $VARIABLE\ $7.png\"" >> $CONFFILE 
 	echo "plot \"$DATA/$MODEL1/$VARIABLE/Data.txt\" $PROPERTIES1, \"$DATA/$MODEL2/$VARIABLE/Data.txt\" $PROPERTIES2" >> $CONFFILE
-
-	#cat $CONFFILE
+	echo -e "${LGREEN}[${LCYAN}---------------------------------------------------------------${LYELLOW}<${LBLUE}"
+	cat $CONFFILE
+	echo -e "${LYELLOW}>${LCYAN}---------------------------------------------------------------${LGREEN}]${RESTORE}"
 	gnuplot $CONFFILE
 	#rm $DATA/$MODEL1/$VARIABLE/Data.txt
 	#rm $DATA/$MODEL2/$VARIABLE/Data.txt
@@ -157,7 +180,7 @@ else
 		if [ "$line" = "" ]; then
 			continue
 		fi
-		echo "[$cnt]~ < $(echo -e "$line") >"
+		echo -e "[${RED}$cnt${RESTORE}]~ ${LCYAN}< ${LGREEN}$(echo -e "$line") ${LCYAN}>${RESTORE}"
 		/bin/bash $(pwd)/generate.sh $(echo -e "$line")
 		((cnt++))
 	done <$1

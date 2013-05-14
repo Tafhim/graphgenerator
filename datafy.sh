@@ -1,6 +1,22 @@
 #!bin/bash
 
-echo "Generating for $1 [$2]";
+RESTORE='\033[0m'
+RED='\033[00;31m'
+GREEN='\033[00;32m'
+YELLOW='\033[00;33m'
+BLUE='\033[00;34m'
+PURPLE='\033[00;35m'
+CYAN='\033[00;36m'
+LIGHTGRAY='\033[00;37m'
+LRED='\033[01;31m'
+LGREEN='\033[01;32m'
+LYELLOW='\033[01;33m'
+LBLUE='\033[01;34m'
+LPURPLE='\033[01;35m'
+LCYAN='\033[01;36m'
+WHITE='\033[01;37m'
+
+echo -e "${YELLOW}Generating for ${LGREEN}$1 ${RESTORE}[${LBLUE}$2${RESTORE}]";
 
 DIR=$4/$1/$2;
 QFILE="Qvalue.dat";
@@ -8,7 +24,6 @@ FIRST=""
 SECOND=""
 PREV=""
 if [ ! -d $DIR/$(echo "1") ]; then
-	echo "Not the working DIR"
 	exit 1
 fi
 rm $DIR/Data.txt
