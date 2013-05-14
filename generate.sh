@@ -47,15 +47,16 @@ if [ "$MODE" = "single" ]; then
 		MAX=$QQQ
 		QQQ=$i
 	done
-	echo $MAX
-	PROPERTIES="$SETTING $TITLE"
+
+	PROPERTIES="$SETTING ls 2 $TITLE"
 
 	rm $(pwd)/temp.conf
 	touch $(pwd)/temp.conf
 	CONFFILE=$(pwd)/temp.conf
 
 	echo "set term pngcairo" > $CONFFILE
-	echo "set style line 1 lt 0" >> $CONFFILE
+	echo "set style line 1 lt 0 lw 3" >> $CONFFILE
+	echo "set style line 2 lc rgb \"red\" lw 3" >> $CONFFILE
 	echo "set style arrow 1 nohead ls 1" >> $CONFFILE
 	echo "set arrow from 0,6 to $MAX,6 as 1" >> $CONFFILE
 	echo "set xrange [0:$MAX]" >> $CONFFILE
@@ -63,7 +64,7 @@ if [ "$MODE" = "single" ]; then
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
 	echo "set output \"$(pwd)/ouput\ $MODEL\ $VARIABLE\ $6.png\"" >> $CONFFILE 
-	echo "plot \"$DATA/$MODEL/$VARIABLE/Data.txt\" $PROPERTIES" >> $CONFFILE
+	echo "plot \"$DATA/$MODEL/$VARIABLE/Data.txt\"  $PROPERTIES" >> $CONFFILE
 	#cat $CONFFILE
 	gnuplot $CONFFILE
 	#rm $DATA/$MODEL/$VARIABLE/Data.txt
@@ -106,15 +107,39 @@ elif [ "$MODE" = "compare" ]; then
 	Y_AXIS=${11}
 	X_AXIS=${X_AXIS//+/ }
 	Y_AXIS=${Y_AXIS//+/ }
+	
+	QQQ=""
+	MAX1=""
+	for i in $(cat $DATA/$MODEL1/$VARIABLE/Data.txt)
+	do
+		MAX1=$QQQ
+		QQQ=$i
+	done
+	MAX2=""
+	for i in $(cat $DATA/$MODEL2/$VARIABLE/Data.txt)
+	do
+		MAX2=$QQQ
+		QQQ=$i
+	done
+	
 
-
-	PROPERTIES1="$SETTING $TITLE1"
-	PROPERTIES2="$SETTING $TITLE2"
+	PROPERTIES1="$SETTING ls 2  $TITLE1"
+	PROPERTIES2="$SETTING ls 3  $TITLE2"
 
 	rm $(pwd)/temp.conf
 	touch $(pwd)/temp.conf
 	CONFFILE=$(pwd)/temp.conf
 	echo "set term pngcairo" > $CONFFILE
+	echo "set style line 2 lc rgb \"red\" lw 3" >> $CONFFILE
+	echo "set style line 3 lc rgb \"blue\" lw 3" >> $CONFFILE
+	echo "set xrange [0:]" >> $CONFFILE
+	echo "set yrange [0:]" >> $CONFFILE
+	if [ "$MAX1" = "$MAX2" ]; then
+		echo "set style line 1 lt 0 lw 3" >> $CONFFILE
+		echo "set style arrow 1 nohead ls 1" >> $CONFFILE
+		echo "set arrow from 0,6 to $MAX1,6 as 1" >> $CONFFILE
+		echo "set xrange [0:$MAX1]" >> $CONFFILE
+	fi
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
 	echo "set output \"$(pwd)/ouput\ $MODEL1\ vs\ $MODEL2\ $VARIABLE\ $7.png\"" >> $CONFFILE 
