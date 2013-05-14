@@ -55,8 +55,9 @@ if [ "$MODE" = "single" ]; then
 	CONFFILE=$(pwd)/temp.conf
 
 	echo "set term pngcairo" > $CONFFILE
-	echo "set arrow from 0,6 to *,6 as 1 nohead" >> $CONFFILE
-	echo "set xrange [0:]" >> $CONFFILE
+	echo "set style arrow 1 nohead dotted" >> $CONFFILE
+	echo "set arrow from 0,6 to $MAX,6 as 1" >> $CONFFILE
+	echo "set xrange [0:$MAX]" >> $CONFFILE
 	echo "set yrange [0:]" >> $CONFFILE
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
