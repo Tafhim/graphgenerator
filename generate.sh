@@ -21,8 +21,6 @@ if [ "$1" = "" ]; then
 	exit 1
 fi
 
-
-
 MODE=$1
 if [ "$MODE" = "single" ]; then
 	MODEL=$2
@@ -56,12 +54,17 @@ if [ "$MODE" = "single" ]; then
 	X_AXIS=${X_AXIS//+/ }
 	Y_AXIS=${Y_AXIS//+/ }
 
-	MAX=""
+	MAXX=""
 	QQQ=""
+	lcount=1
 	for i in $(cat $DATA/$MODEL/$VARIABLE/Data.txt)
 	do
-		MAX=$QQQ
+		MAXX=$QQQ
 		QQQ=$i
+		if [ $lcount = 1 ]; then
+			MINX=$i
+		fi
+		((lcount++))
 	done
 
 	PROPERTIES="$SETTING ls 2 $TITLE"
@@ -73,8 +76,8 @@ if [ "$MODE" = "single" ]; then
 	echo "set style line 1 lt 0 lw 3" >> $CONFFILE
 	echo "set style line 2 lc rgb \"red\" lw 3" >> $CONFFILE
 	echo "set style arrow 1 nohead ls 1" >> $CONFFILE
-	echo "set arrow from 0,6 to $MAX,6 as 1" >> $CONFFILE
-	echo "set xrange [0:$MAX]" >> $CONFFILE
+	echo "set arrow from $MINX,6 to $MAXX,6 as 1" >> $CONFFILE
+	echo "set xrange [$MINX:$MAX]" >> $CONFFILE
 	echo "set yrange [0:]" >> $CONFFILE
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
@@ -128,16 +131,26 @@ elif [ "$MODE" = "compare" ]; then
 	
 	QQQ=""
 	MAX1=""
+	lcount=1
 	for i in $(cat $DATA/$MODEL1/$VARIABLE/Data.txt)
 	do
 		MAX1=$QQQ
 		QQQ=$i
+		if [ $lcount = 1 ]; then
+			MINX1=$i		
+		fi
+		(( lcount++ ))
 	done
 	MAX2=""
+	lcount=1
 	for i in $(cat $DATA/$MODEL2/$VARIABLE/Data.txt)
 	do
 		MAX2=$QQQ
 		QQQ=$i
+		if [ $lcount = 1 ]; then
+			MINX2=$i		
+		fi
+		(( lcount++ ))
 	done
 	
 
@@ -150,16 +163,22 @@ elif [ "$MODE" = "compare" ]; then
 	echo "set term pngcairo" > $CONFFILE
 	echo "set style line 2 lc rgb \"red\" lw 3" >> $CONFFILE
 	echo "set style line 3 lc rgb \"blue\" lw 3" >> $CONFFILE
-	if [ "$MAX1" -ge "$MAX2" ]; then
-		MAX=$MAX1
+	
+	if [ $(bc <<< "$MAX1 >= $MAX2") -eq 1 ]; then
+		MAXX=$MAX1
 	else
-		MAX=$MAX2
+		MAXX=$MAX2
+	fi
+	if [ $(bc <<< "$MINX1 <= $MINX2") -eq 1 ]; then
+		MINX=$MINX1	
+	else	
+		MINX=$MINX2	
 	fi
 	#if [ "$MAX1" = "$MAX2" ]; then
 	echo "set style line 1 lt 0 lw 3" >> $CONFFILE
 	echo "set style arrow 1 nohead ls 1" >> $CONFFILE
-	echo "set arrow from 0,6 to $MAX1,6 as 1" >> $CONFFILE
-	echo "set xrange [0:$MAX1]" >> $CONFFILE
+	echo "set arrow from $MINX,6 to $MAXX,6 as 1" >> $CONFFILE
+	echo "set xrange [$MINX:$MAXX]" >> $CONFFILE
 	echo "set yrange [0:]" >> $CONFFILE	
 	#fi
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
