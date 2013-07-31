@@ -77,7 +77,7 @@ if [ "$MODE" = "single" ]; then
 	echo "set style line 2 lc rgb \"red\" lw 3" >> $CONFFILE
 	echo "set style arrow 1 nohead ls 1" >> $CONFFILE
 	echo "set arrow from $MINX,6 to $MAXX,6 as 1" >> $CONFFILE
-	echo "set xrange [$MINX:$MAX]" >> $CONFFILE
+	echo "set xrange [$MINX:$MAXX]" >> $CONFFILE
 	echo "set yrange [0:]" >> $CONFFILE
 	echo "set xlabel \"$X_AXIS\"" >> $CONFFILE
 	echo "set ylabel \"$Y_AXIS\"" >> $CONFFILE
